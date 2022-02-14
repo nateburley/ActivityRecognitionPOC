@@ -1,3 +1,4 @@
+.DS_Store
 data/wisdm_preprocessed_watch_accel.csv
 data/wisdm_master_raw_dataset.csv
 saved_models/best_extra_trees.pickle

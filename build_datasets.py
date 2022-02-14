@@ -260,7 +260,7 @@ if __name__ == '__main__':
     watch_accel_df.to_csv('data/wisdm_preprocessed_watch_accel.csv')
 
     ### DEBUGGING
-    print(f"There are {len(master_raw_data_df)} rows in the dataset")
+    print(f"There are {len(master_raw_data_df)} rows in the raw dataset")
     print(f"There are {len(set(master_raw_data_df['participant_id']))} users")
     print(f"There are {len(set(master_raw_data_df['activity']))} activities")
     print(f"There are {len(set(master_raw_data_df['sensor_type']))} sensors")

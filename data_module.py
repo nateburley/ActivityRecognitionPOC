@@ -77,4 +77,7 @@ def load_preprocessed_dataset(data_df_filename: str='data/wisdm_preprocessed_wat
     y = data_df.ACTIVITY
     X = data_df.drop('ACTIVITY', axis=1)
 
+    # Fix issue with activity drop above
+    X.drop('Unnamed: 0', inplace=True, axis=1)
+
     return X, y

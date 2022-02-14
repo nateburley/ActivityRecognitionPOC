@@ -5,64 +5,86 @@ Author: Nate Burley
 """
 
 import numpy as np
+import pandas as pd
 import pickle
+import datetime
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix, classification_report, accuracy_score
 
 
-def train_extra_trees(clf: ExtraTreesClassifier, X_train: np.array, y_train: np.array, save: bool=True) -> ExtraTreesClassifier:
+def train_extra_trees(clf: ExtraTreesClassifier, X_train: np.array, y_train: np.array, save: bool=True, grid_search:bool=True) -> ExtraTreesClassifier:
     """
     Function to train an optimal Extra Trees Classifier using a grid search.
     Helpful example: https://www.kaggle.com/eikedehling/extra-trees-tuning
     More info on hyperparameters here: https://machinelearningmastery.com/extra-trees-ensemble-with-python/
     """
-    # Define our grid search
-    gsc = GridSearchCV(
-        estimator=clf,
-        param_grid={
-            'n_estimators': range(50, 150, 50),
-            'max_features': ['sqrt', 'log2', None],
-            # 'min_samples_leaf': range(1,51,10),
-            # 'min_samples_split': range(2,53,10)
-        },
-        scoring='accuracy',
-        verbose=2
-    )
 
-    # Train the classifier and find the optimal parameters
-    grid_result = gsc.fit(X_train, y_train)
+    if grid_search:
+        # Define our grid search
+        gsc = GridSearchCV(
+            estimator=clf,
+            param_grid={
+                'n_estimators': range(50, 150, 50),
+                'max_features': ['sqrt', 'log2', None],
+                # 'min_samples_leaf': range(1,51,10),
+                # 'min_samples_split': range(2,53,10)
+            },
+            scoring='accuracy',
+            verbose=2
+        )
 
-    # Display best parameters and score
-    print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
+        # Train the classifier and find the optimal parameters
+        grid_result = gsc.fit(X_train, y_train)
 
-    # Display the results of training across all parameters
-    for test_mean, param in zip(
-            grid_result.cv_results_['mean_test_score'],
-            # grid_result.cv_results_['mean_train_score'],
-            grid_result.cv_results_['params']):
-        print("Test : %f with: %r" % (test_mean, param))
+        # Display best parameters and score
+        print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
 
-    # Construct and fit optimal model
-    model = ExtraTreesClassifier(**grid_result.best_params_)
-    model.fit(X_train, y_train)
+        # Display the results of training across all parameters
+        for test_mean, param in zip(
+                grid_result.cv_results_['mean_test_score'],
+                # grid_result.cv_results_['mean_train_score'],
+                grid_result.cv_results_['params']):
+            print("Test : %f with: %r" % (test_mean, param))
 
-    # Save the optimal classifier!
-    if save:
-        outfile = open('best_extra_trees.pickle', 'wb')
-        pickle.dump(model, outfile)
-    
-    # Return the optimal model
-    return model
+        # Construct and fit optimal model
+        model = ExtraTreesClassifier(**grid_result.best_params_)
+        model.fit(X_train, y_train)
+
+        # Save the optimal classifier!
+        if save:
+            outfile = open('saved_models/best_extra_trees.pickle', 'wb')
+            pickle.dump(model, outfile)
+        
+        # Return the optimal model
+        return model
+
+    else:
+        # Construct and fit optimal model
+        model = ExtraTreesClassifier()
+        model.fit(X_train, y_train)
+
+        # Save the classifier!
+        if save:
+            outfile = open('saved_models/default_extra_trees.pickle', 'wb')
+            pickle.dump(model, outfile)
+        
+        # Return the optimal model
+        return model
 
 
-def evaluate_model(model: ExtraTreesClassifier, X_test: np.array, y_test: np.array) -> None:
+def evaluate_model(model: ExtraTreesClassifier, X_test: np.array, y_test: np.array, save=False) -> None:
     # Get our model's predictions on the test data
     y_test_pred = model.predict(X_test)
 
     # Generate a classification report
     print("CLASSIFICATION REPORT")
-    print(classification_report(y_true=y_test, y_pred=y_test_pred))
+    report = classification_report(y_true=y_test, y_pred=y_test_pred, output_dict=True)
+    report = pd.DataFrame(report).transpose()
+    print(report.head(10))
+    if save:
+        report.to_excel('extratrees_classification_report.xlsx')
+    
 
     # Print confusion matrix
     print("\nCONFUSION MATRIX")
