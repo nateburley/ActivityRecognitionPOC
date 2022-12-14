@@ -1,7 +1,7 @@
 # Activity Recognition POC
 
 ## Summary
-A simple proof-of-concept to test the efficacy of using a lightweight, simple model architecture, such as SciKit Learn or XGBoost, to classify activities being performed on smart watches.
+A simple proof-of-concept to test the efficacy of using a lightweight, simple model architecture, such as SciKit Learn or XGBoost, to classify activities being performed on smart watches. (I had some time while laid over at the airport in Boise, so... figured it would be fun to do an afternoon hackathon!)
 
 ## Purpose
 Apple's new Core ML framework allows models to be trained on desktop computers or in the cloud, and deployed to the Apple Watch for edge inference. It thus follows that, if we could build a model to passively (and anonymously) detect activities in the background, we could perform services like content recommendation. For example, if we detect that someone is taking a walk, Headspace could recommend the content piece "Take a Mindful Walk". However, due to the limited compute resources and power supply on an Apple Watch, the model needs to be accurate, while performing inference quickly and at low cost. 
